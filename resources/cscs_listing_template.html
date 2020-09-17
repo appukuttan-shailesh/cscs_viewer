@@ -1,0 +1,125 @@
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<html lang="en">
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-164177736-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-164177736-1');
+    </script>
+    <title>HBP CSCS Container Listing</title>
+    <link rel="icon" type="image/png" href="./hbp_diamond_120.png">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="css/live_paper.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://appukuttan-shailesh.github.io/ellipsis.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#html_table_result_summary').DataTable({
+                "order": [[0, "asc"]],
+                "searching": false,
+                "lengthChange": false,
+                "paging": false,
+                "info": false,
+                columnDefs: [{
+                    targets: 1,
+                    render: $.fn.dataTable.render.ellipsis(250)
+                }, {
+                    targets: [2, 3],
+                    render: $.fn.dataTable.render.ellipsis(20)
+                }]
+            });
+        });
+        
+        function openViewer(url, name) {
+            window.open("./cscs_viewer.html?name=" + name + "&url=" + url, "_blank");
+        }
+    </script>
+</head>
+
+<body class="container">
+    <br>
+    <div class="box rounded centered">
+        <a href="" name="link_pagetop" class="waves-effect waves-light" style="text-align:center; color:black">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img class="hbp-icon-small" src="./hbp_diamond_120.png">
+                        </td>
+                        <td>
+                            <span class="title-style subtitle" style="padding-left:5px;">
+                                HBP CSCS Containers
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </a>
+        <h5 class="title-style">CSCS Public Containers</h5>
+    </div>
+
+    <div>
+        <table style="table-layout:fixed; width:100%;">
+            <tr>
+                <td><strong>CSCS Project: </strong> bp00sp06 </td>
+                <!-- <td style="text-align:right"><strong>Page Last Updated: </strong> {{ date }} </td> -->
+            </tr>
+        </table>
+        <br />
+        <p><strong>Contains info for following public CSCS containers:</strong><br /><br />
+        <table id="html_table_result_summary">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Container Name</th>
+                    <th style="text-align:right">Total Size</th>
+                    <th style="text-align:right">Total Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pc in pcs_list %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><a onclick="openViewer('{{ pc["public_url"] }}', '{{ pc["name"] }}')">{{ pc["name"] }}</a></td>
+                    <td style="text-align:right">{{ pc["total_size"]|filesizeformat(true) }}</td>
+                    <td style="text-align:right">{{ pc["total_count"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </p>
+    </div>
+    <br />
+    <div class="rainbow-row">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <br/>
+    <div style="text-align:center">
+        <span>Developed by: Shailesh Appukuttan and Andrew Davison, CNRS</span>
+        <br/>
+        <span><i>Copyright © 2020 EBRAINS. All rights reserved.</i></span>
+    </div>
+    <br/>
+    <br/>
+</body>
+
+</html>

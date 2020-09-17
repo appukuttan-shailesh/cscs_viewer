@@ -1,0 +1,307 @@
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+
+<html lang="en">
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-164177736-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-164177736-1');
+    </script>
+    <title>HBP CSCS Container Viewer</title>
+    <link rel="icon" type="image/png" href="./hbp_diamond_120.png">
+    <meta name="viewport" content="width = device-width, initial-scale = 1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="css/live_paper.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/skin-material/ui.fancytree.min.css"
+        rel="stylesheet" class="skinswitcher">
+    <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2/dist/jquery.fancytree-all-deps.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.glyph.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.gridnav.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.table.js"></script>
+    <link rel="stylesheet" href="css/spinner.css">
+    <style>
+        th {
+            font-size: 11pt;
+        }
+
+        td {
+            font-size: 11pt;
+        }
+
+        span {
+            outline: none;
+        }
+    </style>
+    <script type="text/javascript">
+        // from http://scratch99.com/web-development/javascript/convert-bytes-to-mb-kb/
+        function bytesToSize(bytes) {
+            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes == 0) return 'n/a';
+            var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+            if (i == 0) return bytes + ' ' + sizes[i];
+            return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+        };
+
+        function evalFileType(ext) {
+            switch (ext) {
+                case 'txt':
+                case 'json':
+                case 'yaml':
+                case 'yml':
+                case 'csv':
+                case 'tsv':
+                    return "text"
+                    break;
+                case "jpg":
+                case "jpeg":
+                case "gif":
+                case "png":
+                case "bmp":
+                case "tiff":
+                case "psd":
+                case "svg":
+                case "eps":
+                    return "image"
+                    break;
+                case 'zip':
+                case 'rar':
+                case 'gz':
+                case '7z':
+                    return "archive"
+                    break;
+                case 'pdf':
+                    return "pdf"
+                    break;
+                default:
+                    return "other"
+            }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const url = urlParams.get('url');
+        console.log(url);
+
+        var obj_tree = []
+        fetch('https://cors-anywhere.herokuapp.com/' + url + "?format=json")
+            .then(function (response) {
+                // The response is a Response instance.
+                return response.json();
+            }).then(function (data) {
+                // console.log(data);
+
+                data.map(item => item.name).forEach(function (path, ind) {
+                    let len = path.split('/').length
+                    path.split('/').reduce(function (r, e, idx) {
+                        console.log(r);
+                        console.log(e);
+                        if ((idx === len - 1) && (data[ind]["content_type"] !== "application/directory")) {
+                            r.push({
+                                title: e,
+                                href: url + "/" + path,
+                                type: evalFileType(path.split(".").pop()),
+                                size: bytesToSize(data[ind]["bytes"]),
+                                content_type: data[ind]["content_type"],
+                                last_modified: new Date(data[ind]["last_modified"]).toDateString(),
+                                hash: data[ind]["hash"]
+                            })
+                        } else {
+                            if (!r.find(x => x.title === e)) {
+                                r.push({
+                                    title: e,
+                                    folder: true,
+                                    children: []
+                                })
+                            }
+                        }
+                        return r.find(x => x.title === e).children;
+                    }, obj_tree)
+                })
+                console.log(obj_tree);
+                setContents();
+            });
+
+        function setContainerName() {
+
+            document.getElementById("container_name").innerHTML = name;
+        }
+
+        function setContents() {
+            $('#tree').fancytree({
+                source: obj_tree,
+                titlesTabbable: true,   // Add all node titles to TAB chain
+                clickFolderMode: 2,     // 1:activate, 2:expand, 3:activate and expand, 4:activate (dblclick expands)
+                extensions: ["glyph", "table", "gridnav"],
+                table: {
+                    indentation: 50,         // indent every node level by this amount
+                },
+                glyph: {
+                    preset: "material",
+                    map: {}
+                },
+                gridnav: {
+                    autofocusInput: false, // Focus first embedded input if node gets activated
+                    handleCursorKeys: true   // Allow UP/DOWN in inputs to move to prev/next node
+                },
+                click: function (event, data) { // allow re-loads
+                    var node = data.node,
+                        orgEvent = data.originalEvent;
+
+                    if (node.isActive() && node.data.href) {
+                        // data.tree.reactivate();
+                        window.open(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
+                    }
+                },
+                renderColumns: function (event, data) {
+                    var node = data.node,
+                        $tdList = $(node.tr).find(">td");
+
+                    // Make the title cell span the remaining columns if it's a folder:
+                    if (node.isFolder()) {
+                        $tdList.eq(0)
+                            .prop("colspan", 4)
+                            .nextAll().remove();
+                        return;
+                    } else {
+                        $tdList.eq(1).text(node.data.size).addClass("alignRight");
+                        $tdList.eq(2).text(node.data.content_type).addClass("alignRight");
+                        $tdList.eq(3).text(node.data.last_modified).addClass("alignRight");
+                    }
+                },
+                types: {
+                    "text": { icon: { text: "description", addClass: "material-icons" } },
+                    "image": { icon: { text: "perm_media", addClass: "material-icons" } },
+                    "archive": { icon: { text: "archive", addClass: "material-icons" } },
+                    "pdf": { icon: { text: "picture_as_pdf", addClass: "material-icons" } },
+                    "other": { icon: { text: "insert_drive_file", addClass: "material-icons" } },
+                },
+                icon: function (event, data) {
+                    return data.typeInfo.icon;
+                },
+            }).on("mouseenter,mouseleave", "span.fancytree-title", function (event) {
+                // Add a hover handler to all node titles (using event delegation)
+                var node = $.ui.fancytree.getNode(event);
+                node.info(event.type);
+            });
+            $("#btnGridExpandAll").click(function () {
+                $.ui.fancytree.getTree("#tree").visit(function (node) {
+                    node.setExpanded();
+                });
+            });
+            $("#btnGridCollapseAll").click(function () {
+                $.ui.fancytree.getTree("#tree").visit(function (node) {
+                    node.setExpanded(false);
+                });
+            });
+
+            document.getElementById("loader_container").style.display = 'none';
+            document.getElementById("main_container").style.display = 'block';
+            console.log("Data displayed!");
+        };
+    </script>
+</head>
+
+<body class="container" onload="setContainerName()">
+    <br />
+    <div class="box rounded centered">
+        <a href="" name="link_pagetop" class="waves-effect waves-light" style="text-align:center; color:black">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img class="hbp-icon-small" src="./hbp_diamond_120.png">
+                        </td>
+                        <td>
+                            <span class="title-style subtitle" style="padding-left:5px;">
+                                HBP CSCS Containers
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </a>
+        <h5 class="title-style" id="container_name">CSCS Public Containers</h5>
+    </div>
+
+    <!-- Displays Loading Spinner -->
+    <div id="loader_container" class="loader"
+        style="display: block; position: relative; left:50%; margin-left:-25px; margin-top: 50px; margin-bottom: 50px;">
+    </div>
+
+    <div id="main_container" style="display: none;">
+        <table style="table-layout:fixed; width:100%;">
+            <tr>
+                <td><strong>CSCS Project: </strong> bp00sp06 </td>
+                <!-- <td style="text-align:right"><strong>Page Last Updated: </strong> 11 - 09 - 2020 </td> -->
+            </tr>
+        </table>
+        <br />
+        <a class="waves-effect waves-light btn-small" style="background-color: #FF9933; color:#000; margin-right: 20px;"
+            id="btnGridExpandAll"><i class="material-icons left">open_in_full</i>Expand all
+        </a>
+        <a class="waves-effect waves-light btn-small" style="background-color: #AAAAAA; color:#000"
+            id="btnGridCollapseAll"><i class="material-icons left">close_fullscreen</i>Collapse all
+        </a>
+        <br /><br />
+        <!-- Tree wrapper -->
+        <!-- <div id="tree"></div> -->
+        <table id="tree">
+            <colgroup>
+                <col width="*">
+                </col>
+                <col width="30px">
+                </col>
+                <col width="30px">
+                </col>
+                <col width="150px">
+                </col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="text-align:right">Size</th>
+                    <th style="text-align:right">Content-Type</th>
+                    <th style="text-align:right">Last Modified</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td style="text-align:right"></td>
+                    <td style="text-align:right"></td>
+                    <td style="text-align:right"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br />
+    <div class="rainbow-row">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <br />
+    <div style="text-align:center">
+        <span>Developed by: Shailesh Appukuttan and Andrew Davison, CNRS</span>
+        <br />
+        <span><i>Copyright © 2020 EBRAINS. All rights reserved.</i></span>
+    </div>
+    <br />
+    <br />
+</body>
+
+</html>
