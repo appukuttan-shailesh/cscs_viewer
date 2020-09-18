@@ -7,11 +7,11 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-164177736-1"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-      gtag('config', 'UA-164177736-1');
+        gtag('config', 'UA-164177736-1');
     </script>
     <title>HBP CSCS Container Listing</title>
     <link rel="icon" type="image/png" href="./hbp_diamond_120.png">
@@ -22,8 +22,29 @@
     <link rel="stylesheet" href="css/live_paper.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https:////cdn.datatables.net/plug-ins/1.10.21/sorting/file-size.js"></script>
     <script type="text/javascript" src="https://appukuttan-shailesh.github.io/ellipsis.js"></script>
+    <style>
+        .orange-toast {
+            background-color: #ffb74d;
+            color: #000000;
+        }
+
+        .red-toast {
+            background-color: #d4554c;
+            color: #ffffff;
+        }
+
+        #toast-container {
+            top: auto !important;
+            left: auto !important;
+            bottom: 5%;
+            right: 8%;
+        }
+    </style>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#html_table_result_summary').DataTable({
@@ -32,16 +53,43 @@
                 "lengthChange": false,
                 "paging": false,
                 "info": false,
-                columnDefs: [{
-                    targets: 1,
-                    render: $.fn.dataTable.render.ellipsis(250)
-                }, {
-                    targets: [2, 3],
-                    render: $.fn.dataTable.render.ellipsis(20)
-                }]
+                columnDefs: [
+                    {
+                        targets: 1,
+                        render: $.fn.dataTable.render.ellipsis(250)
+                    },
+                    {
+                        targets: [2, 3],
+                        render: $.fn.dataTable.render.ellipsis(20)
+                    },
+                    {
+                        targets: 2,
+                        type: 'file-size'
+                        // orderable: false
+                    }
+                ]
+            });
+            $("#viewContainer").click(function () {
+                var pc_url = document.getElementById("pcs_url").value;
+                if (!pc_url) {
+                    M.toast({ html: '<span><b>No URL specified!</b></span>', classes: 'rounded, orange-toast' });
+                } else {
+                    M.toast({ html: '<span><b>Checking URL...</b></span>', classes: 'rounded, orange-toast' });
+                    fetch('https://cors-anywhere.herokuapp.com/' + pc_url + "?format=json")
+                        .then(function (response) {
+                            // The response is a Response instance.
+                            return response.status;
+                        }).then(function (status) {
+                            if (status === 200) {
+                                openViewer(pc_url, pc_url.split("/").pop())
+                            } else {
+                                M.toast({ html: '<span><b>Invalid container URL!</b></span>', classes: 'rounded, red-toast' });
+                            }
+                        });
+                }
             });
         });
-        
+
         function openViewer(url, name) {
             window.open("./cscs_viewer.html?name=" + name + "&url=" + url, "_blank");
         }
@@ -68,6 +116,25 @@
             </table>
         </a>
         <h5 class="title-style">CSCS Public Containers</h5>
+    </div>
+
+    <div style="text-align:center">
+        <strong>Specify the container URL below and click on 'View', or choose a container from the listing:</strong>
+    </div>
+    <br /><br />
+
+    <div class="row">
+        <div class="input-field col s10">
+            <input
+                placeholder="e.g. https://object.cscs.ch/v1/AUTH_c0a333ecf7c045809321ce9d9ecdfdea/hippocampus_optimization"
+                id="pcs_url" type="text">
+            <label class="active" for="pcs_url">Container URL</label>
+        </div>
+        <div class="input-field col s2">
+            <a class="waves-effect waves-light btn" style="background-color: #FF9933; color:#000;" id="viewContainer">
+                <i class="material-icons left">pageview</i>View
+            </a>
+        </div>
     </div>
 
     <div>
@@ -112,14 +179,14 @@
         <div></div>
         <div></div>
     </div>
-    <br/>
+    <br />
     <div style="text-align:center">
         <span>Developed by: Shailesh Appukuttan and Andrew Davison, CNRS</span>
-        <br/>
+        <br />
         <span><i>Copyright © 2020 EBRAINS. All rights reserved.</i></span>
     </div>
-    <br/>
-    <br/>
+    <br />
+    <br />
 </body>
 
 </html>

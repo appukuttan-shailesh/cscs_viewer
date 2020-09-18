@@ -4,7 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 import json
 from datetime import datetime
 
-with open('cscs_pcs_data.json', 'r') as f:
+with open('cscs_pcs_data_bp00sp06.json', 'r') as f:
     pcs_json = json.load(f)
 
 pcs_list = []

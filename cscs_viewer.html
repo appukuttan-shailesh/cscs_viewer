@@ -7,11 +7,11 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-164177736-1"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-      gtag('config', 'UA-164177736-1');
+        gtag('config', 'UA-164177736-1');
     </script>
     <title>HBP CSCS Container Viewer</title>
     <link rel="icon" type="image/png" href="./hbp_diamond_120.png">
@@ -20,25 +20,53 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="css/live_paper.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/skin-material/ui.fancytree.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <link href="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/skin-material/ui.fancytree.min.css"
-        rel="stylesheet" class="skinswitcher">
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2/dist/jquery.fancytree-all-deps.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.glyph.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.gridnav.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/mar10/fancytree@2.37.0/dist/modules/jquery.fancytree.table.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
     <link rel="stylesheet" href="css/spinner.css">
     <style>
-        th {
-            font-size: 11pt;
+        .container {
+            width: 85%;
         }
 
+        th,
         td {
             font-size: 11pt;
         }
 
         span {
             outline: none;
+        }
+
+        .fancytree-container span.fancytree-checkbox {
+            color: #e06c00;
+        }
+
+        .material-icons.orange {
+            background-color: transparent !important;
+            ;
+            color: #e06c00;
+        }
+
+        .orange-toast {
+            background-color: #ffb74d;
+            color: #000000;
+        }
+
+        #toast-container {
+            top: auto !important;
+            left: auto !important;
+            bottom: 5%;
+            right: 8%;
         }
     </style>
     <script type="text/javascript">
@@ -102,9 +130,10 @@
                 data.map(item => item.name).forEach(function (path, ind) {
                     let len = path.split('/').length
                     path.split('/').reduce(function (r, e, idx) {
-                        console.log(r);
-                        console.log(e);
+                        // console.log(r);
+                        // console.log(e);
                         if ((idx === len - 1) && (data[ind]["content_type"] !== "application/directory")) {
+                            // new file
                             r.push({
                                 title: e,
                                 href: url + "/" + path,
@@ -116,8 +145,10 @@
                             })
                         } else {
                             if (!r.find(x => x.title === e)) {
+                                // new directory
                                 r.push({
                                     title: e,
+                                    path: path.split('/').slice(0, idx + 1).join("/"),
                                     folder: true,
                                     children: []
                                 })
@@ -131,17 +162,72 @@
             });
 
         function setContainerName() {
-
             document.getElementById("container_name").innerHTML = name;
+        }
+
+        function downloadDirectory(title, basepath, urls) {
+            var zip = new JSZip();
+            var count = 0;
+            var count2 = 0;
+            var zipFilename = title + ".zip";
+
+            M.toast({ html: '<span>Downloading <b>' + zipFilename + '...</b></span>', classes: 'rounded, orange-toast' });
+
+            var paths = [];
+            for (var i = 0; i < urls.length; i++) {
+                paths[i] = urls[i].split(url + "/" + basepath + "/")[1];
+            }
+            // console.log(paths);
+
+            urls.forEach(function (url) {
+                var filename = paths[count2];
+                count2++;
+                // loading a file and add it in a zip file
+                JSZipUtils.getBinaryContent("https://cors-anywhere.herokuapp.com/" + url, function (err, data) {
+                    if (err) {
+                        throw err; // or handle the error
+                    }
+                    zip.file(filename, data, { binary: true });
+                    count++;
+                    if (count === urls.length) {
+                        zip.generateAsync({ type: 'blob' }).then(function (content) {
+                            saveAs(content, zipFilename);
+                        });
+                    }
+                });
+            });
+        }
+
+        function downloadFile(url) {
+            var filename = url.split("/").pop();
+            M.toast({ html: '<span>Downloading <b>' + filename + '...</b></span>', classes: 'rounded, orange-toast' });
+            saveAs("https://cors-anywhere.herokuapp.com/" + url, url.split('/').pop());
+        }
+
+        function getChildrenURLs(data) {
+            var activeNode = data.tree.getActiveNode();
+            var nodes = [];
+
+            activeNode.visit(function (node) {
+                nodes.push(node);  // or node.key, ...
+            });
+            var child_urls = nodes.map(child => child.data.href);
+            child_urls = child_urls.filter(e => e)
+            // console.log(child_urls);
+            return child_urls;
         }
 
         function setContents() {
             $('#tree').fancytree({
                 source: obj_tree,
+                // checkbox: true,
+                // selectMode: 3,       // 1:single, 2:multi, 3:multi-hier
                 titlesTabbable: true,   // Add all node titles to TAB chain
                 clickFolderMode: 2,     // 1:activate, 2:expand, 3:activate and expand, 4:activate (dblclick expands)
                 extensions: ["glyph", "table", "gridnav"],
                 table: {
+                    // checkboxColumnIdx: 0,
+                    // nodeColumnIdx: 1,
                     indentation: 50,         // indent every node level by this amount
                 },
                 glyph: {
@@ -153,12 +239,28 @@
                     handleCursorKeys: true   // Allow UP/DOWN in inputs to move to prev/next node
                 },
                 click: function (event, data) { // allow re-loads
-                    var node = data.node,
-                        orgEvent = data.originalEvent;
+                    // console.log(event);
+                    console.log(data);
 
-                    if (node.isActive() && node.data.href) {
-                        // data.tree.reactivate();
-                        window.open(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
+                    if (data.originalEvent.target.className === "material-icons orange") {
+                        if (data.node.folder) {
+                            // click on download icon for folder
+                            onclick = downloadDirectory(data.node.title, data.node.data.path, getChildrenURLs(data));
+                        } else {
+                            // click on download icon for file
+                            downloadFile(data.node.data.href);
+                        }
+                        // to avoid toggling expansion on download button click
+                        return false
+                    }
+                    if (data.targetType === 'title') {
+                        var node = data.node,
+                            orgEvent = data.originalEvent;
+
+                        if (node.isActive() && node.data.href) {
+                            // data.tree.reactivate();
+                            window.open(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
+                        }
                     }
                 },
                 renderColumns: function (event, data) {
@@ -167,14 +269,16 @@
 
                     // Make the title cell span the remaining columns if it's a folder:
                     if (node.isFolder()) {
-                        $tdList.eq(0)
-                            .prop("colspan", 4)
-                            .nextAll().remove();
-                        return;
+                        // $tdList.eq(0)
+                        //     .prop("colspan", 4)
+                        //     .nextAll().remove();
+                        // return;
+                        $tdList.eq(4).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
                     } else {
                         $tdList.eq(1).text(node.data.size).addClass("alignRight");
                         $tdList.eq(2).text(node.data.content_type).addClass("alignRight");
                         $tdList.eq(3).text(node.data.last_modified).addClass("alignRight");
+                        $tdList.eq(4).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
                     }
                 },
                 types: {
@@ -254,31 +358,39 @@
         <br /><br />
         <!-- Tree wrapper -->
         <!-- <div id="tree"></div> -->
-        <table id="tree">
+        <table id="tree" style="table-layout: fixed;">
             <colgroup>
+                <!-- <col width="40px">
+                </col> -->
                 <col width="*">
                 </col>
-                <col width="30px">
+                <col width="100px">
                 </col>
-                <col width="30px">
+                <col width="200px">
                 </col>
                 <col width="150px">
+                </col>
+                <col width="100px">
                 </col>
             </colgroup>
             <thead>
                 <tr>
+                    <!-- <th></th> -->
                     <th>Name</th>
                     <th style="text-align:right">Size</th>
                     <th style="text-align:right">Content-Type</th>
                     <th style="text-align:right">Last Modified</th>
+                    <th style="text-align:center">Download</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
+                    <!-- <td></td> -->
                     <td></td>
                     <td style="text-align:right"></td>
                     <td style="text-align:right"></td>
                     <td style="text-align:right"></td>
+                    <td style="text-align:center"></td>
                 </tr>
             </tbody>
         </table>
