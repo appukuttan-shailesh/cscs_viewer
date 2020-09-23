@@ -9,6 +9,8 @@ It provides following features:
 
 ## View list of public CSCS containers 
 
+Users can either choose from a listing of CSCS public containers (currently restricted to project bp00sp06), or specify the URL for any public container (irrespective of the project).
+
 Example:
 
 <img src="./screenshots/sample_list.png" alt="Sample CSCS Container Listing" width="80%" align="center">

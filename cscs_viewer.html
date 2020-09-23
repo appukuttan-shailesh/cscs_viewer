@@ -138,7 +138,7 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const name = urlParams.get('name');
-        const url = urlParams.get('url');
+        const url = urlParams.get('url').replace(/\/$/, "");
         console.log(url);
 
         var obj_tree = []
