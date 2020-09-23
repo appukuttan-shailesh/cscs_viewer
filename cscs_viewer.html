@@ -194,34 +194,45 @@
 
         }
 
-        function downloadDirectory(title, basepath, urls) {
-            if (!hasDownloadCookie()) {
-                MaterialDialog.dialog(
-                    '<div> <p>This text is provided to describe the requirements for citing datasets, models and software found via EBRAINS Knowledge Graph Data Platform (KG): <a href="https://kg.ebrains.eu/search">https://kg.ebrains.eu/search</a>. It is meant to provide a more human-readable form of key parts of the KG Terms of Service, but in the event of disagreement between the <a href="https://kg.ebrains.eu/search-terms-of-use.html?v=2.2">KG Terms of Service</a> and these Citation Requirements, the former is to be taken as authoritative.</p> <h6><b>Dataset, model and software licensing</b></h6> <p>Datasets, models and software in the KG have explicit licensing conditions attached. The license is typically one of the Creative Commons licenses. You must follow the licensing conditions attached to the dataset, model or software, including all restrictions on commercial use, requirements for attribution or requirements to share-alike.</p> <h6><b>EBRAINS Knowledge Graph citation policy</b></h6> <p>If you use content or services from the EBRAINS Knowledge Graph (Search or API) to advance a scientific publication you <strong>must</strong> follow the following citation policy:</p> <p>a) For a dataset or model which is released under a Creative Commons license which includes "Attribution": </p> <ul> <li> <p>Cite the dataset / model as defined in the provided citation instructions (“Cite dataset / model”) and - if available - also cite the primary publication listed<br> <em>or</em> </p> </li> <li> <p>in cases where neither citation instructions nor a primary publication are provided, and only in such cases, the names of the contributors should be cited (Data / model provided by Contributor 1, Contributor 2, …, and Contributor N) .</p> </li> </ul> <p>b) For software, please cite as defined in the software\'s respective citation policy. If you can\'t identify a clear citation policy for the software in question, use the open source repository as the citation link. </p> <p>c) For EBRAINS services which were key in attaining your results, please consider citing the corresponding software which the service relies on, including but not limited to:</p> <ul> <li>EBRAINS Knowledge Graph, "https://kg.ebrains.eu"</li> </ul> <p>Failure to cite datasets, models, or software used in another publication or presentation would constitute scientific misconduct. Failure to cite datasets, models, or software used in a scientific publication must be corrected by an Erratum and correction of the given article if it was discovered post-publication.</p> <h6><b>Final thoughts</b></h6> <p>Citations are essential for encouraging researchers to release their datasets, models and software through the KG or other scientific sharing platforms. Your citation may help them to get their next job or next grant and will ultimately encourage researchers to produce and release more useful open data and open source. Make science more reproducible and more efficient.</p> </p></div>', // Alert Body (Acepts html tags)
-                    {
-                        title: 'EBRAINS Knowledge Graph Data Platform Citation Requirements', // Modal title
-                        modalType: "modal-fixed-footer",
-                        buttons: { // Receive buttons
-                            confirm: {
-                                text: 'Accept', //Text of agree button
-                                className: 'orangeButton', // Class of the agree button
-                                callback: function () { // Function for modal click
-                                    console.log("Terms: Accept");
-                                    acceptDownloadCookie();
+        function showDownloadDisclaimer({ type, title, basepath, urls, url, target } = {}) {
+            MaterialDialog.dialog(
+                '<div> <p>This text is provided to describe the requirements for citing datasets, models and software found via EBRAINS Knowledge Graph Data Platform (KG): <a href="https://kg.ebrains.eu/search">https://kg.ebrains.eu/search</a>. It is meant to provide a more human-readable form of key parts of the KG Terms of Service, but in the event of disagreement between the <a href="https://kg.ebrains.eu/search-terms-of-use.html?v=2.2">KG Terms of Service</a> and these Citation Requirements, the former is to be taken as authoritative.</p> <h6><b>Dataset, model and software licensing</b></h6> <p>Datasets, models and software in the KG have explicit licensing conditions attached. The license is typically one of the Creative Commons licenses. You must follow the licensing conditions attached to the dataset, model or software, including all restrictions on commercial use, requirements for attribution or requirements to share-alike.</p> <h6><b>EBRAINS Knowledge Graph citation policy</b></h6> <p>If you use content or services from the EBRAINS Knowledge Graph (Search or API) to advance a scientific publication you <strong>must</strong> follow the following citation policy:</p> <p>a) For a dataset or model which is released under a Creative Commons license which includes "Attribution": </p> <ul> <li> <p>Cite the dataset / model as defined in the provided citation instructions (“Cite dataset / model”) and - if available - also cite the primary publication listed<br> <em>or</em> </p> </li> <li> <p>in cases where neither citation instructions nor a primary publication are provided, and only in such cases, the names of the contributors should be cited (Data / model provided by Contributor 1, Contributor 2, …, and Contributor N) .</p> </li> </ul> <p>b) For software, please cite as defined in the software\'s respective citation policy. If you can\'t identify a clear citation policy for the software in question, use the open source repository as the citation link. </p> <p>c) For EBRAINS services which were key in attaining your results, please consider citing the corresponding software which the service relies on, including but not limited to:</p> <ul> <li>EBRAINS Knowledge Graph, "https://kg.ebrains.eu"</li> </ul> <p>Failure to cite datasets, models, or software used in another publication or presentation would constitute scientific misconduct. Failure to cite datasets, models, or software used in a scientific publication must be corrected by an Erratum and correction of the given article if it was discovered post-publication.</p> <h6><b>Final thoughts</b></h6> <p>Citations are essential for encouraging researchers to release their datasets, models and software through the KG or other scientific sharing platforms. Your citation may help them to get their next job or next grant and will ultimately encourage researchers to produce and release more useful open data and open source. Make science more reproducible and more efficient.</p> </p></div>', // Alert Body (Acepts html tags)
+                {
+                    title: 'EBRAINS Knowledge Graph Data Platform Citation Requirements', // Modal title
+                    modalType: "modal-fixed-footer",
+                    buttons: { // Receive buttons
+                        confirm: {
+                            text: 'Accept', //Text of agree button
+                            className: 'orangeButton', // Class of the agree button
+                            callback: function () { // Function for modal click
+                                console.log("Terms: Accept");
+                                acceptDownloadCookie();
+                                if (type === "folder") {
                                     runDownloadDirectory(title, basepath, urls);
+                                } else if (type == "file") {
+                                    runDownloadFile(url);
+                                } else {
+                                    // title click
+                                    runOpenFile(url, target);
                                 }
-                            },
-                            close: {
-                                text: 'Cancel', //Text of disagree button
-                                className: 'greyButton', // Class of the disagree button
-                                callback: function () { // Function for modal click
-                                    console.log("Terms: Cancel");
-                                    return;
-                                }
+                            }
+                        },
+                        close: {
+                            text: 'Cancel', //Text of disagree button
+                            className: 'greyButton', // Class of the disagree button
+                            callback: function () { // Function for modal click
+                                console.log("Terms: Cancel");
+                                return;
                             }
                         }
                     }
-                );
+                }
+            );
+        }
+
+        function downloadDirectory(title, basepath, urls) {
+            if (!hasDownloadCookie()) {
+                showDownloadDisclaimer({ "type": "folder", "title": title, "basepath": basepath, "urls": urls });
             } else {
                 runDownloadDirectory(title, basepath, urls);
             }
@@ -262,32 +273,7 @@
 
         function downloadFile(url) {
             if (!hasDownloadCookie()) {
-                MaterialDialog.dialog(
-                    '<div> <p>This text is provided to describe the requirements for citing datasets, models and software found via EBRAINS Knowledge Graph Data Platform (KG): <a href="https://kg.ebrains.eu/search">https://kg.ebrains.eu/search</a>. It is meant to provide a more human-readable form of key parts of the KG Terms of Service, but in the event of disagreement between the <a href="https://kg.ebrains.eu/search-terms-of-use.html?v=2.2">KG Terms of Service</a> and these Citation Requirements, the former is to be taken as authoritative.</p> <h6><b>Dataset, model and software licensing</b></h6> <p>Datasets, models and software in the KG have explicit licensing conditions attached. The license is typically one of the Creative Commons licenses. You must follow the licensing conditions attached to the dataset, model or software, including all restrictions on commercial use, requirements for attribution or requirements to share-alike.</p> <h6><b>EBRAINS Knowledge Graph citation policy</b></h6> <p>If you use content or services from the EBRAINS Knowledge Graph (Search or API) to advance a scientific publication you <strong>must</strong> follow the following citation policy:</p> <p>a) For a dataset or model which is released under a Creative Commons license which includes "Attribution": </p> <ul> <li> <p>Cite the dataset / model as defined in the provided citation instructions (“Cite dataset / model”) and - if available - also cite the primary publication listed<br> <em>or</em> </p> </li> <li> <p>in cases where neither citation instructions nor a primary publication are provided, and only in such cases, the names of the contributors should be cited (Data / model provided by Contributor 1, Contributor 2, …, and Contributor N) .</p> </li> </ul> <p>b) For software, please cite as defined in the software\'s respective citation policy. If you can\'t identify a clear citation policy for the software in question, use the open source repository as the citation link. </p> <p>c) For EBRAINS services which were key in attaining your results, please consider citing the corresponding software which the service relies on, including but not limited to:</p> <ul> <li>EBRAINS Knowledge Graph, "https://kg.ebrains.eu"</li> </ul> <p>Failure to cite datasets, models, or software used in another publication or presentation would constitute scientific misconduct. Failure to cite datasets, models, or software used in a scientific publication must be corrected by an Erratum and correction of the given article if it was discovered post-publication.</p> <h6><b>Final thoughts</b></h6> <p>Citations are essential for encouraging researchers to release their datasets, models and software through the KG or other scientific sharing platforms. Your citation may help them to get their next job or next grant and will ultimately encourage researchers to produce and release more useful open data and open source. Make science more reproducible and more efficient.</p> </p></div>', // Alert Body (Acepts html tags)
-                    {
-                        title: 'EBRAINS Knowledge Graph Data Platform Citation Requirements', // Modal title
-                        modalType: "modal-fixed-footer",
-                        buttons: { // Receive buttons
-                            confirm: {
-                                text: 'Accept', //Text of agree button
-                                className: 'orangeButton', // Class of the agree button
-                                callback: function () { // Function for modal click
-                                    console.log("Terms: agree");
-                                    acceptDownloadCookie();
-                                    runDownloadFile(url);
-                                }
-                            },
-                            close: {
-                                text: 'Cancel', //Text of disagree button
-                                className: 'greyButton', // Class of the disagree button
-                                callback: function () { // Function for modal click
-                                    console.log("Terms: disagree");
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                );
+                showDownloadDisclaimer({ "type": "file", "url": url });
             } else {
                 runDownloadFile(url);
             }
@@ -297,6 +283,10 @@
             var filename = url.split("/").pop();
             M.toast({ html: '<span>Downloading <b>' + filename + '...</b></span>', classes: 'rounded, orange-toast' });
             saveAs("https://cors-anywhere.herokuapp.com/" + url, url.split('/').pop());
+        }
+
+        function runOpenFile(url, target) {
+            window.open(url, target);
         }
 
         function getChildrenURLs(data) {
@@ -355,34 +345,9 @@
                         if (node.isActive() && node.data.href) {
                             // data.tree.reactivate();
                             if (!hasDownloadCookie()) {
-                                MaterialDialog.dialog(
-                                    '<div> <p>This text is provided to describe the requirements for citing datasets, models and software found via EBRAINS Knowledge Graph Data Platform (KG): <a href="https://kg.ebrains.eu/search">https://kg.ebrains.eu/search</a>. It is meant to provide a more human-readable form of key parts of the KG Terms of Service, but in the event of disagreement between the <a href="https://kg.ebrains.eu/search-terms-of-use.html?v=2.2">KG Terms of Service</a> and these Citation Requirements, the former is to be taken as authoritative.</p> <h6><b>Dataset, model and software licensing</b></h6> <p>Datasets, models and software in the KG have explicit licensing conditions attached. The license is typically one of the Creative Commons licenses. You must follow the licensing conditions attached to the dataset, model or software, including all restrictions on commercial use, requirements for attribution or requirements to share-alike.</p> <h6><b>EBRAINS Knowledge Graph citation policy</b></h6> <p>If you use content or services from the EBRAINS Knowledge Graph (Search or API) to advance a scientific publication you <strong>must</strong> follow the following citation policy:</p> <p>a) For a dataset or model which is released under a Creative Commons license which includes "Attribution": </p> <ul> <li> <p>Cite the dataset / model as defined in the provided citation instructions (“Cite dataset / model”) and - if available - also cite the primary publication listed<br> <em>or</em> </p> </li> <li> <p>in cases where neither citation instructions nor a primary publication are provided, and only in such cases, the names of the contributors should be cited (Data / model provided by Contributor 1, Contributor 2, …, and Contributor N) .</p> </li> </ul> <p>b) For software, please cite as defined in the software\'s respective citation policy. If you can\'t identify a clear citation policy for the software in question, use the open source repository as the citation link. </p> <p>c) For EBRAINS services which were key in attaining your results, please consider citing the corresponding software which the service relies on, including but not limited to:</p> <ul> <li>EBRAINS Knowledge Graph, "https://kg.ebrains.eu"</li> </ul> <p>Failure to cite datasets, models, or software used in another publication or presentation would constitute scientific misconduct. Failure to cite datasets, models, or software used in a scientific publication must be corrected by an Erratum and correction of the given article if it was discovered post-publication.</p> <h6><b>Final thoughts</b></h6> <p>Citations are essential for encouraging researchers to release their datasets, models and software through the KG or other scientific sharing platforms. Your citation may help them to get their next job or next grant and will ultimately encourage researchers to produce and release more useful open data and open source. Make science more reproducible and more efficient.</p> </p></div>', // Alert Body (Acepts html tags)
-                                    {
-                                        title: 'EBRAINS Knowledge Graph Data Platform Citation Requirements', // Modal title
-                                        modalType: "modal-fixed-footer",
-                                        buttons: { // Receive buttons
-                                            confirm: {
-                                                text: 'Accept', //Text of agree button
-                                                className: 'orangeButton', // Class of the agree button
-                                                callback: function () { // Function for modal click
-                                                    console.log("Terms: agree");
-                                                    acceptDownloadCookie();
-                                                    window.open(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
-                                                }
-                                            },
-                                            close: {
-                                                text: 'Cancel', //Text of disagree button
-                                                className: 'greyButton', // Class of the disagree button
-                                                callback: function () { // Function for modal click
-                                                    console.log("Terms: disagree");
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                );
+                                showDownloadDisclaimer({ "type": "open", "url": node.data.href, "target": (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target });
                             } else {
-                                window.open(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
+                                runOpenFile(node.data.href, (orgEvent.ctrlKey || orgEvent.metaKey) ? "_blank" : node.data.target);
                             }
                         }
                     }
