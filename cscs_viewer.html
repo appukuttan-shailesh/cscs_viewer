@@ -60,6 +60,12 @@
             color: #e06c00;
         }
 
+        .material-icons.orange_link {
+            background-color: transparent !important;
+            ;
+            color: #e06c00;
+        }
+
         .orange-toast {
             background-color: #ffb74d;
             color: #000000;
@@ -302,6 +308,19 @@
             return child_urls;
         }
 
+        function copy_path_to_clipboard(url) {
+            console.log(url);
+            // Source: https://www.30secondsofcode.org/blog/s/copy-text-to-clipboard-with-javascript
+            const el = document.createElement('textarea');
+            el.value = url;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            var filename = url.split("/").pop();
+            M.toast({ html: '<span>URL copied: <b>' + filename + '</b></span>', classes: 'rounded, orange-toast' });
+        }
+
         function setContents() {
             $('#tree').fancytree({
                 source: obj_tree,
@@ -327,6 +346,13 @@
                     // console.log(event);
                     // console.log(data);
 
+                    if (data.originalEvent.target.className === "material-icons orange_link") {
+                        if (!data.node.folder) {
+                            copy_path_to_clipboard(data.node.data.href);
+                        }
+                        // to avoid toggling expansion on download button click
+                        return false
+                    }
                     if (data.originalEvent.target.className === "material-icons orange") {
                         if (data.node.folder) {
                             // click on download icon for folder
@@ -362,12 +388,13 @@
                         //     .prop("colspan", 4)
                         //     .nextAll().remove();
                         // return;
-                        $tdList.eq(4).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
+                        $tdList.eq(5).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
                     } else {
                         $tdList.eq(1).text(node.data.size).addClass("alignRight");
                         $tdList.eq(2).text(node.data.content_type).addClass("alignRight");
                         $tdList.eq(3).text(node.data.last_modified).addClass("alignRight");
-                        $tdList.eq(4).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
+                        $tdList.eq(4).html("<span class='material-icons orange_link' style='cursor: pointer;'>link</span>");
+                        $tdList.eq(5).html("<span class='material-icons orange' style='cursor: pointer;'>get_app</span>");
                     }
                 },
                 types: {
@@ -457,6 +484,8 @@
                     </col>
                     <col width="100px">
                     </col>
+                    <col width="100px">
+                    </col>
                 </colgroup>
                 <thead>
                     <tr>
@@ -465,6 +494,7 @@
                         <th style="text-align:right">Size</th>
                         <th style="text-align:right">Content-Type</th>
                         <th style="text-align:right">Last Modified</th>
+                        <th style="text-align:center">Copy URL</th>
                         <th style="text-align:center">Download</th>
                     </tr>
                 </thead>
@@ -475,6 +505,7 @@
                         <td style="text-align:right"></td>
                         <td style="text-align:right"></td>
                         <td style="text-align:right"></td>
+                        <td style="text-align:center"></td>
                         <td style="text-align:center"></td>
                     </tr>
                 </tbody>
