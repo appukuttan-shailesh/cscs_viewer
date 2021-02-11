@@ -148,7 +148,9 @@
         console.log(url);
 
         var obj_tree = []
-        fetch('https://cors-anywhere.herokuapp.com/' + url + "?format=json")
+        // previously used https://cors-anywhere.herokuapp.com/ - but now has request limits
+        // other options: https://cors-fixer.herokuapp.com/, https://cors-handler.herokuapp.com/ 
+        fetch('https://cors-clear.herokuapp.com/' + url + "?format=json")
             .then(function (response) {
                 // The response is a Response instance.
                 return response.json();
