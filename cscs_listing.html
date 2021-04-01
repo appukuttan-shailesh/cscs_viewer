@@ -75,7 +75,7 @@
                     M.toast({ html: '<span><b>No URL specified!</b></span>', classes: 'rounded, orange-toast' });
                 } else {
                     M.toast({ html: '<span><b>Checking URL...</b></span>', classes: 'rounded, orange-toast' });
-                    fetch('https://cors-anywhere.herokuapp.com/' + pc_url + "?format=json")
+                    fetch('https://corsproxy-sa.herokuapp.com/' + pc_url + "?format=json")
                         .then(function (response) {
                             // The response is a Response instance.
                             return response.status;
