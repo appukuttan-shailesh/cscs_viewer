@@ -4,18 +4,15 @@ Browser based tool for exploring public CSCS containers.
 Available at:<br />
 https://appukuttan-shailesh.github.io/cscs_viewer
 <br /><br />
-It provides following features:
-<br /><br />
 
-## View list of public CSCS containers 
+## Specify a public CSCS container URL
 
-Users can either choose from a listing of CSCS public containers (currently restricted to project bp00sp06), or specify the URL for any public container (irrespective of the project).
+Users can specify the URL for any public container.
 
 Example:
 
-<img src="./screenshots/sample_list.png" alt="Sample CSCS Container Listing" width="80%" align="center">
+<img src="./screenshots/sample_homepage.png" alt="Sample CSCS Container Homepage" width="80%" align="center">
 
-Note: when new containers are added, this list will need to be updated.
 <br /><br />
 
 ## Explore the contents of public CSCS containers 
@@ -23,14 +20,16 @@ Directories can be explored and individual files can be downloaded. The info is 
 
 <img src="./screenshots/sample_container.png" alt="Sample CSCS Container Contents" width="80%" align="center">
 
+These links can be bookmarked for direct access in the future.
+
 <br /><br />
 
 Developed by: Shailesh Appukuttan and Andrew Davison, CNRS<br />
-<i>Copyright © 2020 EBRAINS. All rights reserved.</i>
+<i>Copyright © 2021 EBRAINS. All rights reserved.</i>
 
 <br />
 
 <div><img src="./eu_logo.jpg" alt="EU Logo" width="15%" align="right"></div>
 
 ### ACKNOWLEDGEMENTS
-This open source software code was developed in part in the Human Brain Project, funded from the European Union's Horizon 2020 Framework Programme for Research and Innovation under Specific Grant Agreements No. 720270 and No. 785907 (Human Brain Project SGA1 and SGA2).
+This open source software code was developed in part in the Human Brain Project, funded from the European Union's Horizon 2020 Framework Programme for Research and Innovation under Specific Grant Agreements No. 720270, No. 785907 and No. 945539 (Human Brain Project SGA1, SGA2 and SGA3).
