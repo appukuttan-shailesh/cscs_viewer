@@ -105,7 +105,7 @@
             pc_url = pc_url.slice(0, -1);
           }
           const regex = new RegExp(
-            /^https:\/\/object\.cscs\.ch\/v\d\/AUTH_([0-9]+([a-zA-Z]+[0-9]+)+\/[^/]+$)/g
+            /^https:\/\/object\.cscs\.ch\/v\d\/AUTH_(([a-zA-Z0-9]+)+\/[^\/]+$)/g
           );
           if (!pc_url) {
             M.toast({
