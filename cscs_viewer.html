@@ -428,7 +428,11 @@
                 });
             });
             $("#btnRefresh").click(function () {
-                location.reload(true);
+                if(navigator.userAgent.indexOf("Chrome") != -1 ) {
+                    window.location.href = window.location.href
+                } else {
+                    location.reload(true);
+                }
             });
 
             document.getElementById("loader_container").style.display = 'none';
