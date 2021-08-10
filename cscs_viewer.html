@@ -427,6 +427,9 @@
                     node.setExpanded(false);
                 });
             });
+            $("#btnRefresh").click(function () {
+                location.reload(true);
+            });
 
             document.getElementById("loader_container").style.display = 'none';
             document.getElementById("main_container").style.display = 'block';
@@ -466,11 +469,14 @@
         <div id="main_container" style="display: none;">
             <br />
             <a class="waves-effect waves-light btn-small"
-                style="background-color: #FF9933; color:#000; margin-right: 20px;" id="btnGridExpandAll"><i
+                style="background-color: #FF9933; color:#000; margin-right: 20px; width: 150px;" id="btnGridExpandAll"><i
                     class="material-icons left">open_in_full</i>Expand all
             </a>
-            <a class="waves-effect waves-light btn-small" style="background-color: #AAAAAA; color:#000"
+            <a class="waves-effect waves-light btn-small" style="background-color: #AAAAAA; color:#000; margin-right: 20px; width: 150px;"
                 id="btnGridCollapseAll"><i class="material-icons left">close_fullscreen</i>Collapse all
+            </a>
+            <a class="waves-effect waves-light btn-small" style="background-color: #0D47A1; color:#FFF; width: 150px;"
+                id="btnRefresh"><i class="material-icons left">restore_page</i>Refresh
             </a>
             <br /><br />
             <!-- Tree wrapper -->
